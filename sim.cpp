@@ -7,11 +7,11 @@
 #include <chrono_irrlicht/ChIrrAppInterface.h>
 #include <chrono_irrlicht/ChIrrTools.h>
 
- 
+
 // Use the namespaces of Chrono
 using namespace chrono;
 using namespace chrono::irrlicht;
- 
+
 // Use the main namespaces of Irrlicht
 using namespace irr;
 using namespace irr::core;
@@ -41,10 +41,10 @@ int main() {
     system.SetTimestepperType(ChTimestepper::Type::EULER_IMPLICIT);
     system.SetSolverType(ChSolver::Type::PSOR);
 
- 
+
     // 4- Create the Irrlicht visualization
     ChIrrApp application(&system);
- 
+
     // Bind assets
     application.AssetBindAll();
     application.AssetUpdateAll();
@@ -53,32 +53,32 @@ int main() {
     tools::add_typical_Sky(application.GetDevice());
     tools::add_typical_Lights(application.GetDevice());
     tools::add_typical_Camera(application.GetDevice(), core::vector3df(0, 0, -6));
- 
-    
+
+
     // Timer for enforcing soft real-time
     ChRealtimeStepTimer realtime_timer;
     double time_step = 0.01;
- 
+
     bool removed = false;
-    
+
     while (system.GetChTime() < 10) {
-	        // Irrlicht must prepare frame to draw
+        // Irrlicht must prepare frame to draw
         application.BeginScene(true, true, SColor(255, 140, 161, 192));
- 
+
         // Irrlicht now draws simple lines in 3D world representing a
         // skeleton of the mechanism, in this instant:
         //
         // .. draw items belonging to Irrlicht scene, if any
         application.DrawAll();
         // .. draw a grid
-	tools::drawGrid(application.GetVideoDriver(), 0.5, 0.5);
+        tools::drawGrid(application.GetVideoDriver(), 0.5, 0.5);
         // .. draw GUI items belonging to Irrlicht screen, if any
         application.GetIGUIEnvironment()->drawAll();
-	tools::drawCircle(application.GetVideoDriver(), 0.1, ChCoordsys<>(ChVector<>(0, 0, 0), QUNIT));
- 
+        tools::drawCircle(application.GetVideoDriver(), 0.1, ChCoordsys<>(ChVector<>(0, 0, 0), QUNIT));
+
         system.DoStepDynamics(0.02);
         std::cout << body->GetPos() << "\n";
-	application.EndScene();
+        application.EndScene();
     }
 }
 
