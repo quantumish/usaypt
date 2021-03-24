@@ -1,0 +1,6 @@
+#+TITLE: Chain Fountain
+
+Simulating the "chain fountain" effect with Chrono Engine and some struggle.
+
+[[./chain.gif]]
+
