@@ -74,7 +74,6 @@ int main() {
         tools::drawGrid(application.GetVideoDriver(), 0.5, 0.5);
         // .. draw GUI items belonging to Irrlicht screen, if any
         application.GetIGUIEnvironment()->drawAll();
-        tools::drawCircle(application.GetVideoDriver(), 0.1, ChCoordsys<>(ChVector<>(0, 0, 0), QUNIT));
 
         system.DoStepDynamics(0.02);
         std::cout << body->GetPos() << "\n";
