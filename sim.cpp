@@ -3,31 +3,82 @@
 #include <chrono/physics/ChBodyEasy.h>
 #include <chrono/physics/ChSystemSMC.h>
 #include <chrono/assets/ChVisualization.h>
+#include <chrono_irrlicht/ChIrrApp.h>
+#include <chrono_irrlicht/ChIrrAppInterface.h>
+#include <chrono_irrlicht/ChIrrTools.h>
+
+ 
+// Use the namespaces of Chrono
+using namespace chrono;
+using namespace chrono::irrlicht;
+ 
+// Use the main namespaces of Irrlicht
+using namespace irr;
+using namespace irr::core;
+using namespace irr::scene;
+using namespace irr::video;
+using namespace irr::io;
+using namespace irr::gui;
 
 int main() {
     chrono::ChSystemSMC system;
 
-    auto body = std::make_shared<chrono::ChBody>();
+    auto body = std::make_shared<ChBody>();
 
-    auto mbox = std::make_shared<chrono::ChBoxShape>();
+    auto mbox = std::make_shared<ChBoxShape>();
 
-    mbox->GetBoxGeometry().Pos = chrono::ChVector<>(0,-1,0);
-    mbox->GetBoxGeometry().Size = chrono::ChVector<>(10,0.5,10);
+    mbox->GetBoxGeometry().Pos = ChVector<>(0,-1,0);
+    mbox->GetBoxGeometry().Size = ChVector<>(10,0.5,10);
     body->AddAsset(mbox); 
 
     body->SetMass(10000);
-    body->SetInertiaXX(chrono::ChVector<int>(4,4,4));
+    body->SetInertiaXX(ChVector<int>(4,4,4));
 
     system.Add(body);
 
-    chrono::SetChronoDataPath("./testdata");
+    SetChronoDataPath("./testdata");
 
-    system.SetTimestepperType(chrono::ChTimestepper::Type::EULER_IMPLICIT);
-    system.SetSolverType(chrono::ChSolver::Type::PSOR);
+    system.SetTimestepperType(ChTimestepper::Type::EULER_IMPLICIT);
+    system.SetSolverType(ChSolver::Type::PSOR);
 
+ 
+    // 4- Create the Irrlicht visualization
+    ChIrrApp application(&system);
+ 
+    // Bind assets
+    application.AssetBindAll();
+    application.AssetUpdateAll();
+
+    tools::add_typical_Logo(application.GetDevice());
+    tools::add_typical_Sky(application.GetDevice());
+    tools::add_typical_Lights(application.GetDevice());
+    tools::add_typical_Camera(application.GetDevice(), core::vector3df(0, 0, -6));
+ 
+    
+    // Timer for enforcing soft real-time
+    ChRealtimeStepTimer realtime_timer;
+    double time_step = 0.01;
+ 
+    bool removed = false;
+    
     while (system.GetChTime() < 10) {
+	        // Irrlicht must prepare frame to draw
+        application.BeginScene(true, true, SColor(255, 140, 161, 192));
+ 
+        // Irrlicht now draws simple lines in 3D world representing a
+        // skeleton of the mechanism, in this instant:
+        //
+        // .. draw items belonging to Irrlicht scene, if any
+        application.DrawAll();
+        // .. draw a grid
+	tools::drawGrid(application.GetVideoDriver(), 0.5, 0.5);
+        // .. draw GUI items belonging to Irrlicht screen, if any
+        application.GetIGUIEnvironment()->drawAll();
+	tools::drawCircle(application.GetVideoDriver(), 0.1, ChCoordsys<>(ChVector<>(0, 0, 0), QUNIT));
+ 
         system.DoStepDynamics(0.02);
         std::cout << body->GetPos() << "\n";
+	application.EndScene();
     }
 }
 
