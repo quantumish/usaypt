@@ -10,10 +10,10 @@ find_library(CHRONO_IRRLICHT NAMES libChronoEngine_irrlicht.so REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
-find_path(CHRONO_INCLUDE ChBody.h REQUIRED)
+find_path(CHRONO_INCLUDE NAMES "chrono/ChConfig.h" REQUIRED)
 set(CHRONO_INCLUDE "${CHRONO_INCLUDE}/chrono") # Somewhat questionable
 
-find_path(CHRONO_IRRLICHT_INCLUDE irrlicht.h REQUIRED)
+find_path(CHRONO_IRRLICHT_INCLUDE NAMES "irrlicht/irrlicht.h" REQUIRED)
 set(CHRONO_IRRLICHT_INCLUDE "${CHRONO_IRRLICHT_INCLUDE}/irrlicht") # Somewhat questionable
 
 include_directories(${EIGEN3_INCLUDE_PATH} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_INCLUDE})
