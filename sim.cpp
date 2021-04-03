@@ -1,6 +1,5 @@
 #include <chrono/physics/ChBody.h>
 #include <chrono/assets/ChBoxShape.h>
-#include <chrono/physics/ChBodyEasy.h>
 #include <chrono/physics/ChSystemSMC.h>
 #include <chrono/assets/ChVisualization.h>
 #include <chrono_irrlicht/ChIrrApp.h>

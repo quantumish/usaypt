@@ -11,7 +11,12 @@ if (APPLE)
 else()
   set(CMAKE_CXX_COMPILER "g++")
   include_directories("/usr/include/eigen3" "/usr/include/irrlicht" " /usr/include/chrono/collision/bullet/")
-  link_libraries("/usr/lib/libChronoEngine.so" "/usr/lib/libChronoEngine_irrlicht.so")
+  # Apparently Jack's arch install thinks chrono needs to be at user/local
+  if(EXISTS "/usr/lib/libChronoEngine.so")
+      link_libraries("/usr/lib/libChronoEngine.so" "/usr/lib/libChronoEngine_irrlicht.so")
+  else()
+      link_libraries("/usr/local/lib/libChronoEngine.so" "/usr/local/lib/libChronoEngine_irrlicht.so")
+  endif()
 endif()
 
 add_executable(sim sim.cpp)
