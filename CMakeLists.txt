@@ -4,20 +4,20 @@ project(sim)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if (APPLE)
-  set(CMAKE_CXX_COMPILER "clang++")
-  include_directories("/usr/local/include/eigen3" "/usr/local/include/irrlicht" " /usr/local/include/chrono/collision/bullet/")
-  link_libraries("/usr/local/lib/libChronoEngine.dylib" "/usr/local/lib/libChronoEngine_irrlicht.dylib")
-else()
-  set(CMAKE_CXX_COMPILER "g++")
-  include_directories("/usr/include/eigen3" "/usr/include/irrlicht" " /usr/include/chrono/collision/bullet/")
-  # Apparently Jack's arch install thinks chrono needs to be at user/local
-  if(EXISTS "/usr/lib/libChronoEngine.so")
-      link_libraries("/usr/lib/libChronoEngine.so" "/usr/lib/libChronoEngine_irrlicht.so")
-  else()
-      link_libraries("/usr/local/lib/libChronoEngine.so" "/usr/local/lib/libChronoEngine_irrlicht.so")
-  endif()
-endif()
+find_library(CHRONO_ENGINE NAMES libChronoEngine.so REQUIRED)
+
+find_library(CHRONO_IRRLICHT NAMES libChronoEngine_irrlicht.so REQUIRED)
+
+find_package(Eigen3 REQUIRED)
+
+find_path(CHRONO_INCLUDE ChBody.h REQUIRED)
+set(CHRONO_INCLUDE "${CHRONO_INCLUDE}/chrono") # Somewhat questionable
+
+find_path(CHRONO_IRRLICHT_INCLUDE irrlicht.h REQUIRED)
+set(CHRONO_IRRLICHT_INCLUDE "${CHRONO_IRRLICHT_INCLUDE}/irrlicht") # Somewhat questionable
+
+include_directories(${EIGEN3_INCLUDE_PATH} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_INCLUDE})
+link_libraries(${CHRONO_ENGINE} ${CHRONO_IRRLICHT})
 
 add_executable(sim sim.cpp)
 
