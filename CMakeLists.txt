@@ -16,7 +16,7 @@ set(CHRONO_INCLUDE "${CHRONO_INCLUDE}/chrono") # Somewhat questionable
 find_path(CHRONO_IRRLICHT_INCLUDE NAMES "irrlicht/irrlicht.h" REQUIRED)
 set(CHRONO_IRRLICHT_INCLUDE "${CHRONO_IRRLICHT_INCLUDE}/irrlicht") # Somewhat questionable
 
-include_directories(${EIGEN3_INCLUDE_PATH} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_INCLUDE})
+include_directories(${EIGEN3_INCLUDE_DIR} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_INCLUDE})
 link_libraries(${CHRONO_ENGINE} ${CHRONO_IRRLICHT})
 
 add_executable(sim sim.cpp)
