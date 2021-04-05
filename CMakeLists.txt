@@ -30,9 +30,6 @@ include_directories(${EIGEN3_INCLUDE_DIR} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_IN
 # link libraries
 link_libraries(${CHRONO_ENGINE} ${CHRONO_IRRLICHT})
 
-# ig no need to build this file
-# add_executable(smoke smoke_test.cpp)
-
 # build our final executable
 file( GLOB SOURCES src/*.cpp )
-add_executable(ChainFountain chainfountain.cpp ${SOURCES})
+add_executable(ChainFountain ChainFountain.cpp ${SOURCES})
