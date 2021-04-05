@@ -30,17 +30,9 @@ include_directories(${EIGEN3_INCLUDE_DIR} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_IN
 # link libraries
 link_libraries(${CHRONO_ENGINE} ${CHRONO_IRRLICHT})
 
-# add chrono smoke test
-add_executable(smoke smoke_test.cpp)
+# ig no need to build this file
+# add_executable(smoke smoke_test.cpp)
 
-# build our library
-file( GLOB LIB_SOURCES src/*.cpp )
-file( GLOB LIB_HEADERS include/*.h )
-add_library( ChainFountain ${LIB_SOURCES} ${LIB_HEADERS} )
-
-# and finally, build our final executable
-add_executable(chainfountain_driver chainfountain_driver.cpp)
-
-# link our library
-target_link_libraries(chainfountain_driver ChainFountain)
-
+# build our final executable
+file( GLOB SOURCES src/*.cpp )
+add_executable(ChainFountain chainfountain.cpp ${SOURCES})
