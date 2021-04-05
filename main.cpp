@@ -1,84 +1,51 @@
+#include <string>
 #include <chrono/physics/ChBody.h>
-#include <chrono/assets/ChBoxShape.h>
-#include <chrono/physics/ChSystemSMC.h>
-#include <chrono/assets/ChVisualization.h>
 #include <chrono_irrlicht/ChIrrApp.h>
-#include <chrono_irrlicht/ChIrrAppInterface.h>
-#include <chrono_irrlicht/ChIrrTools.h>
+
+#include <chrono/physics/ChSystemNSC.h>
 
 #include "config.h"
 
-
 // Use the namespaces of Chrono
 using namespace chrono;
-using namespace chrono::irrlicht;
 
-// Use the main namespaces of Irrlicht
-using namespace irr;
-using namespace irr::core;
-using namespace irr::scene;
-using namespace irr::video;
-using namespace irr::io;
-using namespace irr::gui;
+std::shared_ptr<ChMarker> createBearing(ChSystem &system, int id) {
+    // Create the body and its coordinate marker
+    auto bearing_body = std::make_shared<ChBody>();
+    auto bearing_marker = std::make_shared<ChMarker>();
+
+    // Add the marker to the body
+    bearing_body->AddMarker(bearing_marker);
+
+    // Set the name of the bearing marker 
+    // TODO c++ string handling sucks deeply. Better way?
+    bearing_marker->SetName((std::string("BEARING marker ") + std::to_string(id)).c_str());
+
+    // Add the finished body to the system
+    system.AddBody(bearing_body);
+
+    // Return the bearing marker
+    return bearing_marker;
+}
+
+void simulate(ChSystem &system, double upTo) {
+    while (system.GetChTime() < upTo) {
+        system.DoStepDynamics(0.1);
+
+        GetLog() << "hewo" << "\n";
+    }
+}
 
 int main() {
-    chrono::ChSystemSMC system;
+    // Create the physical system we will be working in
+    ChSystemNSC system;
 
-    auto body = std::make_shared<ChBody>();
+    // Create a temp bearing that's ID = 12
+    createBearing(system, 12);
 
-    auto mbox = std::make_shared<ChBoxShape>();
+    // Print the hierachy to the logger
+    system.ShowHierarchy(GetLog());
 
-    mbox->GetBoxGeometry().Pos = ChVector<>(0,-1,0);
-    mbox->GetBoxGeometry().Size = ChVector<>(10,0.5,10);
-    body->AddAsset(mbox); 
-
-    body->SetMass(10000);
-    body->SetInertiaXX(ChVector<int>(4,4,4));
-
-    system.Add(body);
-
-    SetChronoDataPath("./testdata");
-
-    system.SetTimestepperType(ChTimestepper::Type::EULER_IMPLICIT);
-    system.SetSolverType(ChSolver::Type::PSOR);
-
-
-    // 4- Create the Irrlicht visualization
-    ChIrrApp application(&system);
-
-    // Bind assets
-    application.AssetBindAll();
-    application.AssetUpdateAll();
-
-    tools::add_typical_Logo(application.GetDevice());
-    tools::add_typical_Sky(application.GetDevice());
-    tools::add_typical_Lights(application.GetDevice());
-    tools::add_typical_Camera(application.GetDevice(), core::vector3df(0, 0, -6));
-
-
-    // Timer for enforcing soft real-time
-    ChRealtimeStepTimer realtime_timer;
-    double time_step = 0.01;
-
-    bool removed = false;
-
-    while (system.GetChTime() < 10) {
-        // Irrlicht must prepare frame to draw
-        application.BeginScene(true, true, SColor(255, 140, 161, 192));
-
-        // Irrlicht now draws simple lines in 3D world representing a
-        // skeleton of the mechanism, in this instant:
-        //
-        // .. draw items belonging to Irrlicht scene, if any
-        application.DrawAll();
-        // .. draw a grid
-        tools::drawGrid(application.GetVideoDriver(), 0.5, 0.5);
-        // .. draw GUI items belonging to Irrlicht screen, if any
-        application.GetIGUIEnvironment()->drawAll();
-
-        system.DoStepDynamics(0.02);
-        std::cout << body->GetPos() << "\n";
-        application.EndScene();
-    }
+    simulate(system, 10);
 }
 
