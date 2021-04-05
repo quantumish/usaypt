@@ -22,4 +22,5 @@ include_directories(${EIGEN3_INCLUDE_DIR} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_IN
 link_libraries(${CHRONO_ENGINE} ${CHRONO_IRRLICHT})
 
 file( GLOB SOURCES src/*.cpp )
-add_executable(ChainFountain ChainFountain.cpp ${SOURCES})
+add_executable(ChainFountain main.cpp ${SOURCES})
+

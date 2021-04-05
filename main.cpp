@@ -6,6 +6,8 @@
 #include <chrono_irrlicht/ChIrrAppInterface.h>
 #include <chrono_irrlicht/ChIrrTools.h>
 
+#include "config.h"
+
 /*
  * Hewo there, fellow human
  * This is a smoke test for the project
