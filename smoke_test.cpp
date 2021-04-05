@@ -6,6 +6,21 @@
 #include <chrono_irrlicht/ChIrrAppInterface.h>
 #include <chrono_irrlicht/ChIrrTools.h>
 
+/*
+ * Hewo there, fellow human
+ * This is a smoke test for the project
+ * also it is used to remind ourselves how
+ * to write stuff down.
+ *
+ * The CMake file should compile this into
+ * ./smoke, which you could run. The stdout
+ * should show a point falling through space,
+ * whereas the visualization should show
+ * a blank irrlicht canvas.
+ *
+ */
+
+
 
 // Use the namespaces of Chrono
 using namespace chrono;

@@ -43,4 +43,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-sim
+smoke
+chainfountain_driver
+
+
