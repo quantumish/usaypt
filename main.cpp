@@ -15,6 +15,14 @@
 // Use the namespaces of Chrono
 using namespace chrono;
 
+// Use the main namespaces of Irrlicht
+using namespace irrlicht;
+using namespace irr::core;
+using namespace irr::scene;
+using namespace irr::video;
+using namespace irr::io;
+using namespace irr::gui;
+
 /*
  * (#!/Condution | At Home) TODO to resolve
  * - Figure out what unit of measurement Chrono uses. 
@@ -50,9 +58,9 @@ std::shared_ptr<ChMarker> createGround(ChSystem &system) {
     auto groundMaterial = std::make_shared<ChMaterialSurfaceNSC>();
     groundMaterial->SetFriction(0.5);
 
-    // Establish a boxy collision surface. Because
+    // Establish a boxy collision surface. Because collision!
     groundBody->GetCollisionModel()->ClearModel(); // nuke default model
-    groundBody->GetCollisionModel()->AddBox(groundMaterial, 1000000, 5, 10000000); // chuck a box
+    groundBody->GetCollisionModel()->AddBox(groundMaterial, 10, 0.5, 10); // chuck a box
     groundBody->GetCollisionModel()->BuildModel(); // compute model dims
     groundBody->SetCollide(true); // bounce! everybody bounce!
 
@@ -94,8 +102,22 @@ std::shared_ptr<ChMarker> createBearing(ChSystem &system, int id) {
 }
 
 int main() {
+    // Set the working data path
+    SetChronoDataPath("./static");
+
     // Create the physical system we will be working in
     ChSystemNSC system;
+
+    #if RUN_VISUALIZATION
+    // Create the visualization application
+    ChIrrApp application(&system);
+
+    // Setup the visualization niceties and a default camera
+    application.AddTypicalLogo();
+    application.AddTypicalSky();
+    application.AddTypicalLights();
+    application.AddTypicalCamera(vector3df(0, 4, -6));
+    #endif
 
     // Create a ground
     createGround(system);
@@ -112,14 +134,31 @@ int main() {
     // Unlike SetAbsCoord, a function does not clear momentum
     // and friends.
 
-    bearingMarker->Impose_Abs_Coord(ChCoordsys<>(ChVector<double>(0, 10000, 0)));
+    bearingMarker->Impose_Abs_Coord(ChCoordsys<>(ChVector<double>(0, 5, 0)));
+
+    #if RUN_VISUALIZATION
+    // Bind all assets and render them to irrlicht
+    application.AssetBindAll();
+    application.AssetUpdateAll();
+    
+    // Set each animation step to the SIMULATION_RESOLUTION
+    application.SetTimestep(SIMULATION_RESOLUTION);
+    #endif
 
     // Print the hierachy to the logger
     system.ShowHierarchy(GetLog());
 
-    #if START_SIMULATION
-    while (system.GetChTime() < 100) {
-        GetLog() << "Time: " << system.GetChTime() << "\n" <<
+    #if RUN_SIMULATION
+
+    #if RUN_VISUALIZATION
+    while (application.GetDevice()->run() && system.GetChTime() < SIMULATION_DURATION_MAX) {
+        application.BeginScene(true, true, SColor(255, 140, 161, 192));
+        application.DrawAll();
+    #else
+    while (system.GetChTime() < SIMULATION_DURATION_MAX) {
+    #endif
+
+        std::cout << "Time: " << system.GetChTime() << "\n" <<
             "x:" << bearingMarker->GetAbsCoord().pos.x() << " " <<
             "y:" << bearingMarker->GetAbsCoord().pos.y() << " " <<
             "z:" << bearingMarker->GetAbsCoord().pos.z() << " " <<
@@ -127,8 +166,14 @@ int main() {
             "," << bearingMarker->GetAbsCoord().rot.GetVector().y() << 
             "," << bearingMarker->GetAbsCoord().rot.GetVector().z() << ")" << "\n\n";
 
-        system.DoStepDynamics(0.01);
+    #if RUN_VISUALIZATION
+        application.DoStep();
+        application.EndScene();
+    #else
+        system.DoStepDynamics(SIMULATION_RESOLUTION);
+    #endif
     }
+
     #endif
 }
 
