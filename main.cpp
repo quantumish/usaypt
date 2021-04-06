@@ -1,10 +1,16 @@
-#include <string>
-#include <chrono/physics/ChBody.h>
-#include <chrono_irrlicht/ChIrrApp.h>
-
-#include <chrono/physics/ChSystemNSC.h>
-
+// Our config
 #include "config.h"
+
+// std libs
+#include <string>
+
+// chrono libs
+#include <chrono/physics/ChBody.h>
+#include <chrono/physics/ChSystemNSC.h>
+#include <chrono/physics/ChMaterialSurfaceNSC.h>
+
+// chrono visulization libs
+#include <chrono_irrlicht/ChIrrApp.h>
 
 // Use the namespaces of Chrono
 using namespace chrono;
@@ -30,7 +36,7 @@ std::shared_ptr<ChMarker> createGround(ChSystem &system) {
     // Add the marker to the body
     groundBody->AddMarker(groundMarker);
 
-    // But the ground, on the groud!
+    // Put the ground, on the groud!
     groundMarker->Impose_Abs_Coord(ChCoordsys<>(ChVector<double>(0, 0, 0)));
     
     // Make the ground not go anywhere
@@ -38,10 +44,17 @@ std::shared_ptr<ChMarker> createGround(ChSystem &system) {
 
     // Set the name of the bearing marker 
     // TODO c++ string handling sucks deeply. Better way?
-    groundMarker->SetName("GROUND");
+    groundMarker->SetName("GROUND marker");
+
+    // Create the surface material of the ground
+    auto groundMaterial = std::make_shared<ChMaterialSurfaceNSC>();
+    groundMaterial->SetFriction(0.5);
 
     // Establish a boxy collision surface. Because
-    groundBody->GetCollisionModel()->AddBox(nullptr, 1000, 5, 1000);
+    groundBody->GetCollisionModel()->ClearModel(); // nuke default model
+    groundBody->GetCollisionModel()->AddBox(groundMaterial, 1000000, 5, 10000000); // chuck a box
+    groundBody->GetCollisionModel()->BuildModel(); // compute model dims
+    groundBody->SetCollide(true); // bounce! everybody bounce!
 
     // Add the finished body to the system
     system.AddBody(groundBody);
@@ -62,9 +75,16 @@ std::shared_ptr<ChMarker> createBearing(ChSystem &system, int id) {
     // TODO c++ string handling sucks deeply. Better way?
     bearingMarker->SetName((std::string("BEARING marker ") + std::to_string(id)).c_str());
 
+    // Create the surface material of the bearing
+    auto bearingMaterial = std::make_shared<ChMaterialSurfaceNSC>();
+    bearingMaterial->SetFriction(0.5);
+
     // Establish a sphereical collision surface
     // Not quite sure how to add a custom shape yet?
-    bearingBody->GetCollisionModel()->AddSphere(nullptr, 0.01);
+    bearingBody->GetCollisionModel()->ClearModel(); // nuke default model
+    bearingBody->GetCollisionModel()->AddSphere(bearingMaterial, 0.01); // chuck a circle
+    bearingBody->GetCollisionModel()->BuildModel(); // compute model dims
+    bearingBody->SetCollide(true); // bounce! everybody bounce!
 
     // Add the finished body to the system
     system.AddBody(bearingBody);
@@ -97,6 +117,7 @@ int main() {
     // Print the hierachy to the logger
     system.ShowHierarchy(GetLog());
 
+    #if START_SIMULATION
     while (system.GetChTime() < 100) {
         GetLog() << "Time: " << system.GetChTime() << "\n" <<
             "x:" << bearingMarker->GetAbsCoord().pos.x() << " " <<
@@ -108,5 +129,6 @@ int main() {
 
         system.DoStepDynamics(0.01);
     }
+    #endif
 }
 
