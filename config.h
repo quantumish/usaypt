@@ -14,7 +14,7 @@
  * Sometimes, I just want to see the debug output w/o irrlicht.
  */
 
-#define RUN_VISUALIZATION 0
+#define RUN_VISUALIZATION 1
 
 /**
  * What is the temporal resolution of visulization/sims?

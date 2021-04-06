@@ -60,9 +60,15 @@ std::shared_ptr<ChMarker> createGround(ChSystem &system) {
 
     // Establish a boxy collision surface. Because collision!
     groundBody->GetCollisionModel()->ClearModel(); // nuke default model
-    groundBody->GetCollisionModel()->AddBox(groundMaterial, 10, 0.5, 10); // chuck a box
+    groundBody->GetCollisionModel()->AddBox(groundMaterial, 10, 0.01, 10); // chuck a box
     groundBody->GetCollisionModel()->BuildModel(); // compute model dims
     groundBody->SetCollide(true); // bounce! everybody bounce!
+
+    // Establish a visualization shape
+    auto groundVizShape = std::make_shared<ChBoxShape>();
+    groundVizShape->GetBoxGeometry().Pos = ChVector<>(0,-1,0); 
+    groundVizShape->GetBoxGeometry().Size = ChVector<>(10,0.01,10);
+    groundBody->AddAsset(groundVizShape); 
 
     // Add the finished body to the system
     system.AddBody(groundBody);
@@ -90,9 +96,15 @@ std::shared_ptr<ChMarker> createBearing(ChSystem &system, int id) {
     // Establish a sphereical collision surface
     // Not quite sure how to add a custom shape yet?
     bearingBody->GetCollisionModel()->ClearModel(); // nuke default model
-    bearingBody->GetCollisionModel()->AddSphere(bearingMaterial, 0.01); // chuck a circle
+    bearingBody->GetCollisionModel()->AddSphere(bearingMaterial, 0.5); // chuck a circle
     bearingBody->GetCollisionModel()->BuildModel(); // compute model dims
     bearingBody->SetCollide(true); // bounce! everybody bounce!
+
+    // Establish a visualization shape
+    auto bearingVizShape = std::make_shared<ChSphereShape>();
+    bearingVizShape->GetSphereGeometry().center = ChVector<>(0,0,0); 
+    bearingVizShape->GetSphereGeometry().rad = 0.5; 
+    bearingBody->AddAsset(bearingVizShape); 
 
     // Add the finished body to the system
     system.AddBody(bearingBody);
@@ -113,11 +125,19 @@ int main() {
     ChIrrApp application(&system);
 
     // Setup the visualization niceties and a default camera
-    application.AddTypicalLogo();
-    application.AddTypicalSky();
     application.AddTypicalLights();
-    application.AddTypicalCamera(vector3df(0, 4, -6));
+    application.AddTypicalCamera(vector3df(-5, 5, -5));
     #endif
+
+
+
+    /**
+     * <Important>
+     * @@@ Care about this bit that follows!! @@@
+     *
+     * The following is the only non-driver code in this
+     * whole darn thing.
+     */
 
     // Create a ground
     createGround(system);
@@ -134,13 +154,18 @@ int main() {
     // Unlike SetAbsCoord, a function does not clear momentum
     // and friends.
 
-    bearingMarker->Impose_Abs_Coord(ChCoordsys<>(ChVector<double>(0, 5, 0)));
+    bearingMarker->Impose_Abs_Coord(ChCoordsys<>(ChVector<double>(10000, 0, 0)));
+
+    /**
+     * </Important>
+     */
+
+
 
     #if RUN_VISUALIZATION
     // Bind all assets and render them to irrlicht
     application.AssetBindAll();
     application.AssetUpdateAll();
-    
     // Set each animation step to the SIMULATION_RESOLUTION
     application.SetTimestep(SIMULATION_RESOLUTION);
     #endif
