@@ -14,14 +14,20 @@
  * Sometimes, I just want to see the debug output w/o irrlicht.
  */
 
+#if RUN_SIMULATION
 #define RUN_VISUALIZATION 1
+#endif
 
 /**
  * What is the temporal resolution of visulization/sims?
  * What does each "step" mean, in seconds?
+ *
+ * If weird behavior occurs in the visulization, its probably
+ * because of the fact that this number is too large. I find
+ * that 0.01 for SMC sims seems to work well.
  */
 
-#define SIMULATION_RESOLUTION 0.02
+#define SIMULATION_RESOLUTION 0.01
 
 /**
  * What is the max duration of the animation?

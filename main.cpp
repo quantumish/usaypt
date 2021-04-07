@@ -6,8 +6,8 @@
 
 // chrono libs
 #include <chrono/physics/ChBody.h>
-#include <chrono/physics/ChSystemNSC.h>
-#include <chrono/physics/ChMaterialSurfaceNSC.h>
+#include <chrono/physics/ChSystemSMC.h>
+#include <chrono/physics/ChMaterialSurfaceSMC.h>
 
 // chrono visulization libs
 #include <chrono_irrlicht/ChIrrApp.h>
@@ -50,19 +50,19 @@ std::shared_ptr<ChBody> createGround(ChSystem &system) {
     groundBody->SetName("GROUND");
 
     // Create the surface material of the ground
-    auto groundMaterial = std::make_shared<ChMaterialSurfaceNSC>();
+    auto groundMaterial = std::make_shared<ChMaterialSurfaceSMC>();
     groundMaterial->SetFriction(0);
 
     // Establish a boxy collision surface. Because collision!
     groundBody->GetCollisionModel()->ClearModel(); // nuke default model
-    groundBody->GetCollisionModel()->AddBox(groundMaterial, 10, 0, 10); // chuck a box
+    groundBody->GetCollisionModel()->AddBox(groundMaterial, 100, 1, 100); // chuck a box
     groundBody->GetCollisionModel()->BuildModel(); // compute model dims
     groundBody->SetCollide(true); // bounce! everybody bounce!
 
     // Establish a visualization shape
     auto groundVizShape = std::make_shared<ChBoxShape>();
     groundVizShape->GetBoxGeometry().Pos = ChVector<>(0,0,0); 
-    groundVizShape->GetBoxGeometry().Size = ChVector<>(10, 0, 10);
+    groundVizShape->GetBoxGeometry().Size = ChVector<>(100, 1, 100);
     groundBody->AddAsset(groundVizShape); 
 
     // Add the finished body to the system
@@ -72,30 +72,36 @@ std::shared_ptr<ChBody> createGround(ChSystem &system) {
     return groundBody;
 }
 
-std::shared_ptr<ChBody> createBearing(ChSystem &system, int id) {
+std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass = 5, double radius=1, double frictionForce=0.01);
+std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass, double radius, double frictionForce) {
+    static int id = 0;
+
     // Create the body and its coordinate marker
     auto bearingBody = std::make_shared<ChBody>();
 
     // Set the name of the bearing 
     // TODO c++ string handling sucks deeply. Better way?
-    bearingBody->SetName((std::string("BEARING ") + std::to_string(id)).c_str());
+    bearingBody->SetName((std::string("BEARING ") + std::to_string(id++)).c_str());
 
     // Create the surface material of the bearing
-    auto bearingMaterial = std::make_shared<ChMaterialSurfaceNSC>();
-    bearingMaterial->SetFriction(0);
+    auto bearingMaterial = std::make_shared<ChMaterialSurfaceSMC>();
+    bearingMaterial->SetFriction(frictionForce);
 
     // Establish a sphereical collision surface
     // Not quite sure how to add a custom shape yet?
     bearingBody->GetCollisionModel()->ClearModel(); // nuke default model
-    bearingBody->GetCollisionModel()->AddSphere(bearingMaterial, 0.5); // chuck a circle
+    bearingBody->GetCollisionModel()->AddSphere(bearingMaterial, radius); // chuck a circle
     bearingBody->GetCollisionModel()->BuildModel(); // compute model dims
     bearingBody->SetCollide(true); // bounce! everybody bounce!
 
     // Establish a visualization shape
     auto bearingVizShape = std::make_shared<ChSphereShape>();
     bearingVizShape->GetSphereGeometry().center = ChVector<>(0,0,0); 
-    bearingVizShape->GetSphereGeometry().rad = 0.5; 
+    bearingVizShape->GetSphereGeometry().rad = radius; 
     bearingBody->AddAsset(bearingVizShape); 
+
+    // Set the mass of the system
+    bearingBody->SetMass(mass);
 
     // Add the finished body to the system
     system.AddBody(bearingBody);
@@ -109,7 +115,7 @@ int main() {
     SetChronoDataPath("./static");
 
     // Create the physical system we will be working in
-    ChSystemNSC system;
+    ChSystemSMC system;
 
     // Clear gravity
     //system.Set_G_acc(ChVector<>(0, 0, 0));
@@ -136,8 +142,9 @@ int main() {
     // Create a ground
     auto groundBody = createGround(system);
 
-    // Create a temp bearing that's ID = 0
-    auto bearingBody = createBearing(system, 0);
+    auto bearingBody = createBearing(system, 1, 1, 1);
+    auto bearingBody1 = createBearing(system, 1, 1, 1);
+    auto bearingBody2 = createBearing(system, 1, 1, 1);
     
     // Let's move this bearing up
     // A NOTE for why Impose_Abs_Coord is used and not
@@ -148,18 +155,9 @@ int main() {
     // Unlike SetAbsCoord, a function does not clear momentum
     // and friends.
 
-    bearingBody->SetPos(ChVector<double>(0,10,0));
-
-    // TODO the createBearing function should set the weight, but for nowwe need a weight
-    bearingBody->SetMass(25);
-
-    // Apply a force on the ball   
-    //                             
-    //                             
-    // Punch the ground up       // force vector       // where to apply     // is force w.r.t. object or w.r.t. system?
-    //bearingBody->Accumulate_force(ChVector<>(30, 0, -30), bearingBody->GetPos(), false);
-
-
+    bearingBody->SetPos(ChVector<double>(0,5,0));
+    bearingBody1->SetPos(ChVector<double>(0,10,0));
+    bearingBody2->SetPos(ChVector<double>(0,20,0));
 
     /**
      * </Important>
