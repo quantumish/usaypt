@@ -171,6 +171,7 @@ int main() {
     application.AssetUpdateAll();
     // Set each animation step to the SIMULATION_RESOLUTION
     application.SetTimestep(SIMULATION_RESOLUTION);
+    application.SetTryRealtime(true);
     #endif
 
     // Print the hierachy to the logger
