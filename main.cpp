@@ -120,7 +120,7 @@ int main() {
 
     // Setup the visualization niceties and a default camera
     application.AddTypicalLights();
-    application.AddTypicalCamera(vector3df(-5, 5, -5));
+    application.AddTypicalCamera(vector3df(-20, 20, -20));
     #endif
 
 
@@ -134,7 +134,7 @@ int main() {
      */
 
     // Create a ground
-    createGround(system);
+    auto groundBody = createGround(system);
 
     // Create a temp bearing that's ID = 0
     auto bearingBody = createBearing(system, 0);
@@ -150,11 +150,16 @@ int main() {
 
     bearingBody->SetPos(ChVector<double>(0,10,0));
 
-    // TODO the createBearing function should do this, but we need a weight
-    bearingBody->SetMass(10);
+    // TODO the createBearing function should set the weight, but for nowwe need a weight
+    bearingBody->SetMass(25);
 
-    // Hey, maybe let's make this ball have a slight acceleration
-    bearingBody->SetPos_dtdt(ChVector<double>(100000,0,1));
+    // Apply a force on the ball   
+    //                             
+    //                             
+    // Punch the ground up       // force vector       // where to apply     // is force w.r.t. object or w.r.t. system?
+    //bearingBody->Accumulate_force(ChVector<>(30, 0, -30), bearingBody->GetPos(), false);
+
+
 
     /**
      * </Important>
