@@ -36,62 +36,53 @@ using namespace irr::gui;
  *
  */
 
-std::shared_ptr<ChMarker> createGround(ChSystem &system) {
+std::shared_ptr<ChBody> createGround(ChSystem &system) {
     // Create the body and its coordinate marker
     auto groundBody = std::make_shared<ChBody>();
-    auto groundMarker = std::make_shared<ChMarker>();
-
-    // Add the marker to the body
-    groundBody->AddMarker(groundMarker);
 
     // Put the ground, on the groud!
-    groundMarker->Impose_Abs_Coord(ChCoordsys<>(ChVector<double>(0, 0, 0)));
+    groundBody->SetPos(ChVector<>(0,0,0));
     
     // Make the ground not go anywhere
     groundBody->SetBodyFixed(true);
 
-    // Set the name of the bearing marker 
-    // TODO c++ string handling sucks deeply. Better way?
-    groundMarker->SetName("GROUND marker");
+    // Set the name of the  ground
+    groundBody->SetName("GROUND");
 
     // Create the surface material of the ground
     auto groundMaterial = std::make_shared<ChMaterialSurfaceNSC>();
-    groundMaterial->SetFriction(0.5);
+    groundMaterial->SetFriction(0);
 
     // Establish a boxy collision surface. Because collision!
     groundBody->GetCollisionModel()->ClearModel(); // nuke default model
-    groundBody->GetCollisionModel()->AddBox(groundMaterial, 10, 0.01, 10); // chuck a box
+    groundBody->GetCollisionModel()->AddBox(groundMaterial, 10, 0, 10); // chuck a box
     groundBody->GetCollisionModel()->BuildModel(); // compute model dims
     groundBody->SetCollide(true); // bounce! everybody bounce!
 
     // Establish a visualization shape
     auto groundVizShape = std::make_shared<ChBoxShape>();
-    groundVizShape->GetBoxGeometry().Pos = ChVector<>(0,-1,0); 
-    groundVizShape->GetBoxGeometry().Size = ChVector<>(10,0.01,10);
+    groundVizShape->GetBoxGeometry().Pos = ChVector<>(0,0,0); 
+    groundVizShape->GetBoxGeometry().Size = ChVector<>(10, 0, 10);
     groundBody->AddAsset(groundVizShape); 
 
     // Add the finished body to the system
     system.AddBody(groundBody);
 
     // Return the bearing marker
-    return groundMarker;
+    return groundBody;
 }
 
-std::shared_ptr<ChMarker> createBearing(ChSystem &system, int id) {
+std::shared_ptr<ChBody> createBearing(ChSystem &system, int id) {
     // Create the body and its coordinate marker
     auto bearingBody = std::make_shared<ChBody>();
-    auto bearingMarker = std::make_shared<ChMarker>();
 
-    // Add the marker to the body
-    bearingBody->AddMarker(bearingMarker);
-
-    // Set the name of the bearing marker 
+    // Set the name of the bearing 
     // TODO c++ string handling sucks deeply. Better way?
-    bearingMarker->SetName((std::string("BEARING marker ") + std::to_string(id)).c_str());
+    bearingBody->SetName((std::string("BEARING ") + std::to_string(id)).c_str());
 
     // Create the surface material of the bearing
     auto bearingMaterial = std::make_shared<ChMaterialSurfaceNSC>();
-    bearingMaterial->SetFriction(0.5);
+    bearingMaterial->SetFriction(0);
 
     // Establish a sphereical collision surface
     // Not quite sure how to add a custom shape yet?
@@ -110,7 +101,7 @@ std::shared_ptr<ChMarker> createBearing(ChSystem &system, int id) {
     system.AddBody(bearingBody);
 
     // Return the bearing marker
-    return bearingMarker;
+    return bearingBody;
 }
 
 int main() {
@@ -119,6 +110,9 @@ int main() {
 
     // Create the physical system we will be working in
     ChSystemNSC system;
+
+    // Clear gravity
+    //system.Set_G_acc(ChVector<>(0, 0, 0));
 
     #if RUN_VISUALIZATION
     // Create the visualization application
@@ -143,7 +137,7 @@ int main() {
     createGround(system);
 
     // Create a temp bearing that's ID = 0
-    auto bearingMarker = createBearing(system, 0);
+    auto bearingBody = createBearing(system, 0);
     
     // Let's move this bearing up
     // A NOTE for why Impose_Abs_Coord is used and not
@@ -154,7 +148,13 @@ int main() {
     // Unlike SetAbsCoord, a function does not clear momentum
     // and friends.
 
-    bearingMarker->Impose_Abs_Coord(ChCoordsys<>(ChVector<double>(10000, 0, 0)));
+    bearingBody->SetPos(ChVector<double>(0,10,0));
+
+    // TODO the createBearing function should do this, but we need a weight
+    bearingBody->SetMass(10);
+
+    // Hey, maybe let's make this ball have a slight acceleration
+    bearingBody->SetPos_dtdt(ChVector<double>(100000,0,1));
 
     /**
      * </Important>
@@ -184,12 +184,12 @@ int main() {
     #endif
 
         std::cout << "Time: " << system.GetChTime() << "\n" <<
-            "x:" << bearingMarker->GetAbsCoord().pos.x() << " " <<
-            "y:" << bearingMarker->GetAbsCoord().pos.y() << " " <<
-            "z:" << bearingMarker->GetAbsCoord().pos.z() << " " <<
-            "rot (" << bearingMarker->GetAbsCoord().rot.GetVector().x() << 
-            "," << bearingMarker->GetAbsCoord().rot.GetVector().y() << 
-            "," << bearingMarker->GetAbsCoord().rot.GetVector().z() << ")" << "\n\n";
+            "x:" << bearingBody->GetPos().x() << " " <<
+            "y:" << bearingBody->GetPos().y() << " " <<
+            "z:" << bearingBody->GetPos().z() << " " <<
+            "rot (" << bearingBody->GetRot().GetVector().x() << 
+            "," << bearingBody->GetRot().GetVector().y() << 
+            "," << bearingBody->GetRot().GetVector().z() << ")" << "\n\n";
 
     #if RUN_VISUALIZATION
         application.DoStep();
