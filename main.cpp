@@ -36,40 +36,42 @@ using namespace irr::gui;
  *
  */
 
-std::shared_ptr<ChBody> createGround(ChSystem &system) {
-	// Create the body and its coordinate marker
-	auto groundBody = std::make_shared<ChBody>();
+std::shared_ptr<ChBody>
+createGround(ChSystem &system) {
+  // Create the body and its coordinate marker
+  auto groundBody = std::make_shared<ChBody>();
 
-	// Put the ground, on the groud!
-	groundBody->SetPos(ChVector<>(0,0,0));
+  // Put the ground, on the groud!
+  groundBody->SetPos(ChVector<>(0, 0, 0));
 
-	// Make the ground not go anywhere
-	groundBody->SetBodyFixed(true);
+  // Make the ground not go anywhere
+  groundBody->SetBodyFixed(true);
 
-	// Set the name of the  ground
-	groundBody->SetName("GROUND");
+  // Set the name of the  ground
+  groundBody->SetName("GROUND");
 
-	// Create the surface material of the ground
-	auto groundMaterial = std::make_shared<ChMaterialSurfaceSMC>();
-	groundMaterial->SetFriction(0);
+  // Create the surface material of the ground
+  auto groundMaterial = std::make_shared<ChMaterialSurfaceSMC>();
+  groundMaterial->SetFriction(0);
 
-	// Establish a boxy collision surface. Because collision!
-	groundBody->GetCollisionModel()->ClearModel(); // nuke default model
-	groundBody->GetCollisionModel()->AddBox(groundMaterial, 100, 1, 100); // chuck a box
-	groundBody->GetCollisionModel()->BuildModel(); // compute model dims
-	groundBody->SetCollide(true); // bounce! everybody bounce!
+  // Establish a boxy collision surface. Because collision!
+  groundBody->GetCollisionModel()->ClearModel(); // nuke default model
+  groundBody->GetCollisionModel()->AddBox(groundMaterial, 100, 1,
+										  100);  // chuck a box
+  groundBody->GetCollisionModel()->BuildModel(); // compute model dims
+  groundBody->SetCollide(true);                  // bounce! everybody bounce!
 
-	// Establish a visualization shape
-	auto groundVizShape = std::make_shared<ChBoxShape>();
-	groundVizShape->GetBoxGeometry().Pos = ChVector<>(0,0,0);
-	groundVizShape->GetBoxGeometry().Size = ChVector<>(100, 1, 100);
-	groundBody->AddAsset(groundVizShape);
+  // Establish a visualization shape
+  auto groundVizShape = std::make_shared<ChBoxShape>();
+  groundVizShape->GetBoxGeometry().Pos = ChVector<>(0, 0, 0);
+  groundVizShape->GetBoxGeometry().Size = ChVector<>(100, 1, 100);
+  groundBody->AddAsset(groundVizShape);
 
-	// Add the finished body to the system
-	system.AddBody(groundBody);
+  // Add the finished body to the system
+  system.AddBody(groundBody);
 
-	// Return the bearing marker
-	return groundBody;
+  // Return the bearing marker
+  return groundBody;
 }
 
 std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass = 5, double radius=1, double frictionForce=0.01);
@@ -131,7 +133,7 @@ int main() {
 
 	// Setup the visualization niceties and a default camera
 	application.AddTypicalLights();
-	application.AddTypicalCamera(vector3df(-20, 20, -20));
+	application.AddTypicalCamera(vector3df(-100, 100, -100));
 	#endif
 
 
@@ -147,10 +149,6 @@ int main() {
 	// Create a ground
 	auto groundBody = createGround(system);
 
-	auto bearingBody = createBearing(system, 1, 1, 1);
-	auto bearingBody1 = createBearing(system, 1, 1, 1);
-	auto bearingBody2 = createBearing(system, 1, 1, 1);
-
 	// Let's move this bearing up
 	// A NOTE for why Impose_Abs_Coord is used and not
 	// SetAbsCoord. That, my friend, is because
@@ -160,16 +158,23 @@ int main() {
 	// Unlike SetAbsCoord, a function does not clear momentum
 	// and friends.
 
-	bearingBody->SetPos(ChVector<double>(0,5,0));
-	bearingBody1->SetPos(ChVector<double>(0,10,0));
-	bearingBody2->SetPos(ChVector<double>(0,20,0));
-
-	auto link = std::make_shared<ChLinkLockRevolute>();
-	link->Initialize(bearingBody, bearingBody1,
-					 ChCoordsys<>(ChVector<>(1, 0, 0), Q_from_AngAxis(-CH_C_PI / 2, ChVector<>(1, 0, 0))));
-	system.Add(link);
-
-	/**
+	auto prev = createBearing(system, 1, 1, 1);
+	prev->SetPos(ChVector<double>(0,5,0));
+	for (int i = 1; i < 30; i++) {
+		auto bearingBody = createBearing(system, 1, 1, 1);
+		bearingBody->SetPos(ChVector<double>(0,5+(10*i),0));
+		auto link = std::make_shared<ChLinkLockLock>();
+		link->Initialize(prev, bearingBody,
+						 ChCoordsys<>(ChVector<>(0, 10*i, 0)));
+		auto bearingVizShape = std::make_shared<ChCylinderShape>();
+		bearingVizShape->GetCylinderGeometry().rad = 0.3;
+		bearingVizShape->GetCylinderGeometry().p1 = ChVector<>(0,-5,0);
+		bearingVizShape->GetCylinderGeometry().p2 = ChVector<>(0,5,0);
+		link->AddAsset(bearingVizShape);
+		system.Add(link);
+		prev=bearingBody;
+	}
+		/**
 	 * </Important>
 	 */
 
@@ -196,13 +201,13 @@ int main() {
 	while (system.GetChTime() < SIMULATION_DURATION_MAX) {
 	#endif
 
-		std::cout << "Time: " << system.GetChTime() << "\n" <<
-			"x:" << bearingBody->GetPos().x() << " " <<
-			"y:" << bearingBody->GetPos().y() << " " <<
-			"z:" << bearingBody->GetPos().z() << " " <<
-			"rot (" << bearingBody->GetRot().GetVector().x() <<
-			"," << bearingBody->GetRot().GetVector().y() <<
-			"," << bearingBody->GetRot().GetVector().z() << ")" << "\n\n";
+		// std::cout << "Time: " << system.GetChTime() << "\n" <<
+		//	"x:" << bearingBody->GetPos().x() << " " <<
+		//	"y:" << bearingBody->GetPos().y() << " " <<
+		//	"z:" << bearingBody->GetPos().z() << " " <<
+		//	"rot (" << bearingBody->GetRot().GetVector().x() <<
+		//	"," << bearingBody->GetRot().GetVector().y() <<
+		//	"," << bearingBody->GetRot().GetVector().z() << ")" << "\n\n";
 
 	#if RUN_VISUALIZATION
 		application.DoStep();
