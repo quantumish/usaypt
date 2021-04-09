@@ -25,7 +25,7 @@ using namespace irr::gui;
 
 /*
  * (#!/Condution | At Home) TODO to resolve
- * - Figure out what unit of measurement Chrono uses. 
+ * - Figure out what unit of measurement Chrono uses.
  *   metres and seconds and radians assumed
  *
  */
@@ -37,172 +37,175 @@ using namespace irr::gui;
  */
 
 std::shared_ptr<ChBody> createGround(ChSystem &system) {
-    // Create the body and its coordinate marker
-    auto groundBody = std::make_shared<ChBody>();
+	// Create the body and its coordinate marker
+	auto groundBody = std::make_shared<ChBody>();
 
-    // Put the ground, on the groud!
-    groundBody->SetPos(ChVector<>(0,0,0));
-    
-    // Make the ground not go anywhere
-    groundBody->SetBodyFixed(true);
+	// Put the ground, on the groud!
+	groundBody->SetPos(ChVector<>(0,0,0));
 
-    // Set the name of the  ground
-    groundBody->SetName("GROUND");
+	// Make the ground not go anywhere
+	groundBody->SetBodyFixed(true);
 
-    // Create the surface material of the ground
-    auto groundMaterial = std::make_shared<ChMaterialSurfaceSMC>();
-    groundMaterial->SetFriction(0);
+	// Set the name of the  ground
+	groundBody->SetName("GROUND");
 
-    // Establish a boxy collision surface. Because collision!
-    groundBody->GetCollisionModel()->ClearModel(); // nuke default model
-    groundBody->GetCollisionModel()->AddBox(groundMaterial, 100, 1, 100); // chuck a box
-    groundBody->GetCollisionModel()->BuildModel(); // compute model dims
-    groundBody->SetCollide(true); // bounce! everybody bounce!
+	// Create the surface material of the ground
+	auto groundMaterial = std::make_shared<ChMaterialSurfaceSMC>();
+	groundMaterial->SetFriction(0);
 
-    // Establish a visualization shape
-    auto groundVizShape = std::make_shared<ChBoxShape>();
-    groundVizShape->GetBoxGeometry().Pos = ChVector<>(0,0,0); 
-    groundVizShape->GetBoxGeometry().Size = ChVector<>(100, 1, 100);
-    groundBody->AddAsset(groundVizShape); 
+	// Establish a boxy collision surface. Because collision!
+	groundBody->GetCollisionModel()->ClearModel(); // nuke default model
+	groundBody->GetCollisionModel()->AddBox(groundMaterial, 100, 1, 100); // chuck a box
+	groundBody->GetCollisionModel()->BuildModel(); // compute model dims
+	groundBody->SetCollide(true); // bounce! everybody bounce!
 
-    // Add the finished body to the system
-    system.AddBody(groundBody);
+	// Establish a visualization shape
+	auto groundVizShape = std::make_shared<ChBoxShape>();
+	groundVizShape->GetBoxGeometry().Pos = ChVector<>(0,0,0);
+	groundVizShape->GetBoxGeometry().Size = ChVector<>(100, 1, 100);
+	groundBody->AddAsset(groundVizShape);
 
-    // Return the bearing marker
-    return groundBody;
+	// Add the finished body to the system
+	system.AddBody(groundBody);
+
+	// Return the bearing marker
+	return groundBody;
 }
 
 std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass = 5, double radius=1, double frictionForce=0.01);
 std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass, double radius, double frictionForce) {
-    static int id = 0;
+	static int id = 0;
 
-    // Create the body and its coordinate marker
-    auto bearingBody = std::make_shared<ChBody>();
+	// Create the body and its coordinate marker
+	auto bearingBody = std::make_shared<ChBody>();
 
-    // Set the name of the bearing 
-    // TODO c++ string handling sucks deeply. Better way?
-    bearingBody->SetName((std::string("BEARING ") + std::to_string(id++)).c_str());
+	// Set the name of the bearing
+	// TODO c++ string handling sucks deeply. Better way?
+	bearingBody->SetName((std::string("BEARING ") + std::to_string(id++)).c_str());
 
-    // Create the surface material of the bearing
-    auto bearingMaterial = std::make_shared<ChMaterialSurfaceSMC>();
-    bearingMaterial->SetFriction(frictionForce);
+	// Create the surface material of the bearing
+	auto bearingMaterial = std::make_shared<ChMaterialSurfaceSMC>();
+	bearingMaterial->SetFriction(frictionForce);
 
-    // Establish a sphereical collision surface
-    // Not quite sure how to add a custom shape yet?
-    bearingBody->GetCollisionModel()->ClearModel(); // nuke default model
-    bearingBody->GetCollisionModel()->AddSphere(bearingMaterial, radius); // chuck a circle
-    bearingBody->GetCollisionModel()->BuildModel(); // compute model dims
-    bearingBody->SetCollide(true); // bounce! everybody bounce!
+	// Establish a sphereical collision surface
+	// Not quite sure how to add a custom shape yet?
+	bearingBody->GetCollisionModel()->ClearModel(); // nuke default model
+	bearingBody->GetCollisionModel()->AddSphere(bearingMaterial, radius); // chuck a circle
+	bearingBody->GetCollisionModel()->BuildModel(); // compute model dims
+	bearingBody->SetCollide(true); // bounce! everybody bounce!
 
-    // Establish a visualization shape
-    auto bearingVizShape = std::make_shared<ChSphereShape>();
-    bearingVizShape->GetSphereGeometry().center = ChVector<>(0,0,0); 
-    bearingVizShape->GetSphereGeometry().rad = radius; 
-    bearingBody->AddAsset(bearingVizShape); 
+	// Establish a visualization shape
+	auto bearingVizShape = std::make_shared<ChSphereShape>();
+	bearingVizShape->GetSphereGeometry().center = ChVector<>(0,0,0);
+	bearingVizShape->GetSphereGeometry().rad = radius;
+	bearingBody->AddAsset(bearingVizShape);
 
-    // Set the mass of the system
-    bearingBody->SetMass(mass);
+	// Set the mass of the system
+	bearingBody->SetMass(mass);
 
-    // Add the finished body to the system
-    system.AddBody(bearingBody);
+	// Add the finished body to the system
+	system.AddBody(bearingBody);
 
-    // Return the bearing marker
-    return bearingBody;
+	// Return the bearing marker
+	return bearingBody;
 }
 
 int main() {
-    // Set the working data path
-    SetChronoDataPath("./static");
+	// Set the working data path
+	SetChronoDataPath("./static");
 
-    // Create the physical system we will be working in
-    ChSystemSMC system;
+	// Create the physical system we will be working in
+	ChSystemSMC system;
 
-    // Clear gravity
-    //system.Set_G_acc(ChVector<>(0, 0, 0));
+	// Clear gravity
+	//system.Set_G_acc(ChVector<>(0, 0, 0));
 
-    #if RUN_VISUALIZATION
-    // Create the visualization application
-    ChIrrApp application(&system);
+	#if RUN_VISUALIZATION
+	// Create the visualization application
+	ChIrrApp application(&system);
 
-    // Setup the visualization niceties and a default camera
-    application.AddTypicalLights();
-    application.AddTypicalCamera(vector3df(-20, 20, -20));
-    #endif
-
-
-
-    /**
-     * <Important>
-     * @@@ Care about this bit that follows!! @@@
-     *
-     * The following is the only non-driver code in this
-     * whole darn thing.
-     */
-
-    // Create a ground
-    auto groundBody = createGround(system);
-
-    auto bearingBody = createBearing(system, 1, 1, 1);
-    auto bearingBody1 = createBearing(system, 1, 1, 1);
-    auto bearingBody2 = createBearing(system, 1, 1, 1);
-    
-    // Let's move this bearing up
-    // A NOTE for why Impose_Abs_Coord is used and not
-    // SetAbsCoord. That, my friend, is because 
-    // Impose_Abs_Coord sets the coordinates now AND 
-    // sets that as the "resting position" for the object.
-    //
-    // Unlike SetAbsCoord, a function does not clear momentum
-    // and friends.
-
-    bearingBody->SetPos(ChVector<double>(0,5,0));
-    bearingBody1->SetPos(ChVector<double>(0,10,0));
-    bearingBody2->SetPos(ChVector<double>(0,20,0));
-
-    /**
-     * </Important>
-     */
+	// Setup the visualization niceties and a default camera
+	application.AddTypicalLights();
+	application.AddTypicalCamera(vector3df(-20, 20, -20));
+	#endif
 
 
 
-    #if RUN_VISUALIZATION
-    // Bind all assets and render them to irrlicht
-    application.AssetBindAll();
-    application.AssetUpdateAll();
-    // Set each animation step to the SIMULATION_RESOLUTION
-    application.SetTimestep(SIMULATION_RESOLUTION);
-    application.SetTryRealtime(true);
-    #endif
+	/**
+	 * <Important>
+	 * @@@ Care about this bit that follows!! @@@
+	 *
+	 * The following is the only non-driver code in this
+	 * whole darn thing.
+	 */
 
-    // Print the hierachy to the logger
-    system.ShowHierarchy(GetLog());
+	// Create a ground
+	auto groundBody = createGround(system);
 
-    #if RUN_SIMULATION
+	auto bearingBody = createBearing(system, 1, 1, 1);
+	auto bearingBody1 = createBearing(system, 1, 1, 1);
+	auto bearingBody2 = createBearing(system, 1, 1, 1);
 
-    #if RUN_VISUALIZATION
-    while (application.GetDevice()->run() && system.GetChTime() < SIMULATION_DURATION_MAX) {
-        application.BeginScene(true, true, SColor(255, 140, 161, 192));
-        application.DrawAll();
-    #else
-    while (system.GetChTime() < SIMULATION_DURATION_MAX) {
-    #endif
+	// Let's move this bearing up
+	// A NOTE for why Impose_Abs_Coord is used and not
+	// SetAbsCoord. That, my friend, is because
+	// Impose_Abs_Coord sets the coordinates now AND
+	// sets that as the "resting position" for the object.
+	//
+	// Unlike SetAbsCoord, a function does not clear momentum
+	// and friends.
 
-        std::cout << "Time: " << system.GetChTime() << "\n" <<
-            "x:" << bearingBody->GetPos().x() << " " <<
-            "y:" << bearingBody->GetPos().y() << " " <<
-            "z:" << bearingBody->GetPos().z() << " " <<
-            "rot (" << bearingBody->GetRot().GetVector().x() << 
-            "," << bearingBody->GetRot().GetVector().y() << 
-            "," << bearingBody->GetRot().GetVector().z() << ")" << "\n\n";
+	bearingBody->SetPos(ChVector<double>(0,5,0));
+	bearingBody1->SetPos(ChVector<double>(0,10,0));
+	bearingBody2->SetPos(ChVector<double>(0,20,0));
 
-    #if RUN_VISUALIZATION
-        application.DoStep();
-        application.EndScene();
-    #else
-        system.DoStepDynamics(SIMULATION_RESOLUTION);
-    #endif
-    }
+	auto link = std::make_shared<ChLinkLockRevolute>();
+	link->Initialize(bearingBody, bearingBody1,
+					 ChCoordsys<>(ChVector<>(1, 0, 0), Q_from_AngAxis(-CH_C_PI / 2, ChVector<>(1, 0, 0))));
+	system.Add(link);
 
-    #endif
+	/**
+	 * </Important>
+	 */
+
+
+	#if RUN_VISUALIZATION
+	// Bind all assets and render them to irrlicht
+	application.AssetBindAll();
+	application.AssetUpdateAll();
+	// Set each animation step to the SIMULATION_RESOLUTION
+	application.SetTimestep(SIMULATION_RESOLUTION);
+	application.SetTryRealtime(true);
+	#endif
+
+	// Print the hierachy to the logger
+	system.ShowHierarchy(GetLog());
+
+	#if RUN_SIMULATION
+
+	#if RUN_VISUALIZATION
+	while (application.GetDevice()->run() && system.GetChTime() < SIMULATION_DURATION_MAX) {
+		application.BeginScene(true, true, SColor(255, 140, 161, 192));
+		application.DrawAll();
+	#else
+	while (system.GetChTime() < SIMULATION_DURATION_MAX) {
+	#endif
+
+		std::cout << "Time: " << system.GetChTime() << "\n" <<
+			"x:" << bearingBody->GetPos().x() << " " <<
+			"y:" << bearingBody->GetPos().y() << " " <<
+			"z:" << bearingBody->GetPos().z() << " " <<
+			"rot (" << bearingBody->GetRot().GetVector().x() <<
+			"," << bearingBody->GetRot().GetVector().y() <<
+			"," << bearingBody->GetRot().GetVector().z() << ")" << "\n\n";
+
+	#if RUN_VISUALIZATION
+		application.DoStep();
+		application.EndScene();
+	#else
+		system.DoStepDynamics(SIMULATION_RESOLUTION);
+	#endif
+	}
+
+	#endif
 }
-
