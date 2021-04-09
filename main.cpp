@@ -100,6 +100,11 @@ std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass, double radi
     bearingVizShape->GetSphereGeometry().rad = radius; 
     bearingBody->AddAsset(bearingVizShape); 
 
+    auto mfloorcolor = chrono_types::make_shared<ChColorAsset>();
+    mfloorcolor->SetColor(ChColor(0.01*(rand()%100), 0.01*(rand()%100), 0.01*(rand()%100)));
+    bearingBody->AddAsset(mfloorcolor);
+
+
     // Set the mass of the system
     bearingBody->SetMass(mass);
 
