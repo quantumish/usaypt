@@ -27,7 +27,7 @@
  * that 0.01 for SMC sims seems to work well.
  */
 
-#define SIMULATION_RESOLUTION 0.01
+#define SIMULATION_RESOLUTION 0.005
 
 /**
  * What is the max duration of the animation?

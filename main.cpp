@@ -160,7 +160,7 @@ int main() {
 
 	auto prev = createBearing(system, 1, 1, 1);
 	prev->SetPos(ChVector<double>(0,5,0));
-	for (int i = 1; i < 30; i++) {
+	for (int i = 1; i<=10; i++) {
 		auto bearingBody = createBearing(system, 1, 1, 1);
 		bearingBody->SetPos(ChVector<double>(0,5+(10*i),0));
 		auto link = std::make_shared<ChLinkLockLock>();
@@ -168,13 +168,37 @@ int main() {
 						 ChCoordsys<>(ChVector<>(0, 10*i, 0)));
 		auto bearingVizShape = std::make_shared<ChCylinderShape>();
 		bearingVizShape->GetCylinderGeometry().rad = 0.3;
-		bearingVizShape->GetCylinderGeometry().p1 = ChVector<>(0,-5,0);
-		bearingVizShape->GetCylinderGeometry().p2 = ChVector<>(0,5,0);
+		bearingVizShape->GetCylinderGeometry().p1 = ChVector<>(0,-4,0);
+		bearingVizShape->GetCylinderGeometry().p2 = ChVector<>(0,4,0);
 		link->AddAsset(bearingVizShape);
+
 		system.Add(link);
-		prev=bearingBody;
+
+		auto bearingBody2 = createBearing(system, 1, 1, 1);
+		bearingBody2->SetPos(ChVector<double>(0,7+(10*i),0));
+		auto link2 = std::make_shared<ChLinkLockSpherical>();
+		link2->Initialize(bearingBody, bearingBody2,
+						 ChCoordsys<>(ChVector<>(0, 5.5+10*i, 0)));
+		prev=bearingBody2;
 	}
 		/**
+    bearingBody->SetPos(ChVector<double>(0,5,0));
+    bearingBody1->SetPos(ChVector<double>(0,7,0));
+
+    bearingBody2->SetPos(ChVector<double>(0,20,0));
+
+    auto link = std::make_shared<ChLinkLockSpherical>();
+    link->Initialize(bearingBody, bearingBody1,
+                     ChCoordsys<>(ChVector<>(0, 6, 0)));
+    system.Add(link);
+
+    auto link2 = std::make_shared<ChLinkLockLock>();
+    link2->Initialize(bearingBody1, bearingBody2,
+                     ChCoordsys<>(ChVector<>(0, 13.5, 0)));
+    system.Add(link2);
+
+
+	**
 	 * </Important>
 	 */
 
