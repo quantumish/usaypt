@@ -147,6 +147,9 @@ int main() {
 	 */
 
 	// Create a ground
+    // TODO there is NOOOOO reaction forces emitted by
+    // ground. we need a "ground ground" below the gorund
+    // which will have a reaction force
 	auto groundBody = createGround(system);
 
 	// Let's move this bearing up
@@ -179,6 +182,8 @@ int main() {
 		auto link2 = std::make_shared<ChLinkLockSpherical>();
 		link2->Initialize(bearingBody, bearingBody2,
 						 ChCoordsys<>(ChVector<>(0, 5.5+10*i, 0)));
+
+        system.Add(link2);
 		prev=bearingBody2;
 	}
 		/**
