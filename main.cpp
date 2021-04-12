@@ -268,17 +268,17 @@ int main() {
     // which will have a reaction force
     auto groundBody = createGround(system);
 
-    auto prev = createBearing(system);
-    prev->SetPos(ChVector<double>(0,1,0));
+    auto root1 = createBearing(system);
+    root1->SetPos(ChVector<double>(0,1,0));
 
     for (int i=0; i<CHAIN_LENGTH; i++) {
         auto next1 = createBearing(system);
-        linkBearings(system, prev, next1);
+        linkBearings(system, root1, next1);
 
         auto next2 = createBearing(system);
         groupBearings(system, next1, next2);
 
-        prev = next2;
+        root1 = next2;
     }
 
     /**
@@ -314,12 +314,12 @@ int main() {
 #endif
 
              std::cout << "Time: " << system.GetChTime() << "\n" <<
-                "x:" << prev ->GetPos().x() << " " <<
-                "y:" << prev ->GetPos().y() << " " <<
-                "z:" << prev ->GetPos().z() << " " <<
-                "rot (" << prev ->GetRot().GetVector().x() <<
-                "," << prev ->GetRot().GetVector().y() <<
-                "," << prev ->GetRot().GetVector().z() << ")" << "\n\n";
+                "x:" << root1 ->GetPos().x() << " " <<
+                "y:" << root1 ->GetPos().y() << " " <<
+                "z:" << root1 ->GetPos().z() << " " <<
+                "rot (" << root1 ->GetRot().GetVector().x() <<
+                "," << root1 ->GetRot().GetVector().y() <<
+                "," << root1 ->GetRot().GetVector().z() << ")" << "\n\n";
 
 #if RUN_VISUALIZATION
             application.DoStep();
