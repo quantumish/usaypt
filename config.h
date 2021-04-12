@@ -23,7 +23,7 @@
  * How long should the chain be? 0-0 = one length
  */
 
-#define CHAIN_LENGTH 50
+#define CHAIN_LENGTH 5
 
 
 
