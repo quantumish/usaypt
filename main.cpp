@@ -79,7 +79,7 @@ createGround(ChSystem &system) {
     return groundBody;
 }
 
-std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass = 5, double radius=1, double frictionForce=0.01);
+std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass=BEARING_MASS, double radius=BEARING_RADIUS, double frictionForce=BEARING_FRICTION);
 std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass, double radius, double frictionForce) {
     static int id = 0;
 
@@ -121,7 +121,7 @@ std::shared_ptr<ChBody> createBearing(ChSystem &system, double mass, double radi
     return bearingBody;
 }
 
-std::shared_ptr<ChBody> createLink(ChSystem &system, double mass = 1, double radius=1, double length=10, double frictionForce=0.01);
+std::shared_ptr<ChBody> createLink(ChSystem &system, double mass=LINK_MASS, double radius=LINK_RADIUS, double length=LINK_LENGTH, double frictionForce=LINK_FRICTION);
 std::shared_ptr<ChBody> createLink(ChSystem &system, double mass, double radius, double length, double frictionForce) {
     static int id = 0;
 
@@ -176,7 +176,7 @@ typedef std::shared_ptr<ChBody> ChBodyPointer;
  * returns the body shared pointer representing the middle stick
  */
 
-ChBodyPointer linkBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation=10, double connectorMass=1, double connectorRadius=0.5, double connectorFrictionForce=0.01, double linkBearingPadding=0);
+ChBodyPointer linkBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation=LINK_LENGTH, double connectorMass=LINK_MASS, double connectorRadius=LINK_RADIUS, double connectorFrictionForce=LINK_FRICTION, double linkBearingPadding=LINK_PADDING);
 ChBodyPointer linkBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation, double connectorMass, double connectorRadius, double connectorFrictionForce, double linkBearingPadding) {
     // Move the unpositioned element up to the correct position
     auto currentPosition = positionedBearing->GetPos();
@@ -215,7 +215,7 @@ ChBodyPointer linkBearings(ChSystem &system, ChBodyPointer &positionedBearing, C
  * returns nada
  */
 
-void groupBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation=3);
+void groupBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation=BEARING_PADDING);
 void groupBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation) {
     // Move the unpositioned element up to the correct position
     auto currentPosition = positionedBearing->GetPos();
@@ -248,7 +248,7 @@ int main() {
 
     // Setup the visualization niceties and a default camera
     application.AddTypicalLights();
-    application.AddTypicalCamera(vector3df(-100, 100, -100));
+    application.AddTypicalCamera(vector3df(-0.1, 0.1, -0.1));
 #endif
 
 
@@ -276,14 +276,14 @@ int main() {
     // Unlike SetAbsCoord, a function does not clear momentum
     // and friends.
 
-    auto prev = createBearing(system, 1, 1, 1);
-    prev->SetPos(ChVector<double>(0,5,0));
+    auto prev = createBearing(system);
+    prev->SetPos(ChVector<double>(0,0.1,0));
 
-    auto next1 = createBearing(system, 1, 1, 1);
+    auto next1 = createBearing(system);
     linkBearings(system, prev, next1);
 
-    auto next2 = createBearing(system, 1, 1, 1);
-    auto next3 = createBearing(system, 1, 1, 1);
+    auto next2 = createBearing(system);
+    auto next3 = createBearing(system);
 
     groupBearings(system, next1, next2);
     linkBearings(system, next2, next3);
