@@ -267,83 +267,20 @@ int main() {
     // which will have a reaction force
     auto groundBody = createGround(system);
 
-    // Let's move this bearing up
-    // A NOTE for why Impose_Abs_Coord is used and not
-    // SetAbsCoord. That, my friend, is because
-    // Impose_Abs_Coord sets the coordinates now AND
-    // sets that as the "resting position" for the object.
-    //
-    // Unlike SetAbsCoord, a function does not clear momentum
-    // and friends.
-
     auto prev = createBearing(system);
-    prev->SetPos(ChVector<double>(0,0.1,0));
+    prev->SetPos(ChVector<double>(0,0.01,0));
 
-    auto next1 = createBearing(system);
-    linkBearings(system, prev, next1);
+    for (int i=0; i<CHAIN_LENGTH; i++) {
+        auto next1 = createBearing(system);
+        linkBearings(system, prev, next1);
 
-    auto next2 = createBearing(system);
-    auto next3 = createBearing(system);
+        auto next2 = createBearing(system);
+        groupBearings(system, next1, next2);
 
-    groupBearings(system, next1, next2);
-    linkBearings(system, next2, next3);
+        prev = next2;
+    }
 
-    //auto prev = createBearing(system, 1, 1, 1);
-    //prev->SetPos(ChVector<double>(0,5,0));
-    //for (int i = 1; i<=10; i++) {
-        //auto bearingBody = createBearing(system, 1, 1, 1);
-        //bearingBody->SetPos(ChVector<double>(0,5+(10*i),0));
-
-        //auto linkBody = createLink(system, 1, 0.3, 10, 1);
-
-        //linkBody->SetPos(ChVector<>(0, 5+5+(10*(i-1)), 0));
-
-        //auto bottomSolder = std::make_shared<ChLinkLockLock>();
-        //auto topSolder = std::make_shared<ChLinkLockLock>();
-
-        //auto prevMarker = std::make_shared<ChMarker>();
-        //auto nextMarker = std::make_shared<ChMarker>();
-        //auto linkMarker = std::make_shared<ChMarker>();
-
-        //prev->AddMarker(prevMarker);
-        //bearingBody->AddMarker(nextMarker);
-        //linkBody->AddMarker(linkMarker);
-
-        //bottomSolder -> Initialize(prevMarker, linkMarker);
-        //topSolder -> Initialize(linkMarker, nextMarker);
-
-        //system.Add(bottomSolder);
-        //system.Add(topSolder);
-
-        //auto bearingBody2 = createBearing(system, 1, 1, 1);
-        //bearingBody2->SetPos(ChVector<double>(0,7+(10*i),0));
-
-        //auto nextTempMarker = std::make_shared<ChMarker>();
-        //bearingBody2->AddMarker(nextTempMarker);
-
-        //auto link2 = std::make_shared<ChLinkLockSpherical>();
-        //link2->Initialize(nextMarker, nextTempMarker);
-
-        //system.Add(link2);
-        //prev=bearingBody2;
-    //}
     /**
-      bearingBody->SetPos(ChVector<double>(0,5,0));
-      bearingBody1->SetPos(ChVector<double>(0,7,0));
-
-      bearingBody2->SetPos(ChVector<double>(0,20,0));
-
-      auto link = std::make_shared<ChLinkLockSpherical>();
-      link->Initialize(bearingBody, bearingBody1,
-      ChCoordsys<>(ChVector<>(0, 6, 0)));
-      system.Add(link);
-
-      auto link2 = std::make_shared<ChLinkLockLock>();
-      link2->Initialize(bearingBody1, bearingBody2,
-      ChCoordsys<>(ChVector<>(0, 13.5, 0)));
-      system.Add(link2);
-
-
      **
      * </Important>
      */
