@@ -8,6 +8,7 @@
 // chrono libs
 #include <chrono/physics/ChBody.h>
 #include <chrono/physics/ChSystemSMC.h>
+#include <chrono/solver/ChSolverPSOR.h>
 #include <chrono/physics/ChMaterialSurfaceSMC.h>
 
 // chrono visulization libs
@@ -139,7 +140,7 @@ std::shared_ptr<ChBody> createLink(ChSystem &system, double mass, double radius,
     // Establish a sphereical collision surface
     // Not quite sure how to add a custom shape yet?
     linkBody->GetCollisionModel()->ClearModel(); // nuke default model
-    linkBody->GetCollisionModel()->AddCylinder(linkMaterial, radius, radius, length);
+    linkBody->GetCollisionModel()->AddCylinder(linkMaterial, radius, 0, length/2);
     linkBody->GetCollisionModel()->BuildModel(); // compute model dims
     linkBody->SetCollide(true); // bounce! everybody bounce!
 
@@ -248,7 +249,7 @@ int main() {
 
     // Setup the visualization niceties and a default camera
     application.AddTypicalLights();
-    application.AddTypicalCamera(vector3df(-0.1, 0.1, -0.1));
+    application.AddTypicalCamera(vector3df(-10, 10, -10));
 #endif
 
 
@@ -268,7 +269,7 @@ int main() {
     auto groundBody = createGround(system);
 
     auto prev = createBearing(system);
-    prev->SetPos(ChVector<double>(0,0.01,0));
+    prev->SetPos(ChVector<double>(0,1,0));
 
     for (int i=0; i<CHAIN_LENGTH; i++) {
         auto next1 = createBearing(system);
@@ -293,6 +294,10 @@ int main() {
     // Set each animation step to the SIMULATION_RESOLUTION
     application.SetTimestep(SIMULATION_RESOLUTION);
     application.SetTryRealtime(true);
+    // Set the solver
+    auto solver = chrono_types::make_shared<ChSolverPSOR>();
+    solver->EnableWarmStart(true);
+    system.SetSolver(solver);
 #endif
 
     // Print the hierachy to the logger
@@ -308,13 +313,13 @@ int main() {
         while (system.GetChTime() < SIMULATION_DURATION_MAX) {
 #endif
 
-            // std::cout << "Time: " << system.GetChTime() << "\n" <<
-            //	"x:" << bearingBody->GetPos().x() << " " <<
-            //	"y:" << bearingBody->GetPos().y() << " " <<
-            //	"z:" << bearingBody->GetPos().z() << " " <<
-            //	"rot (" << bearingBody->GetRot().GetVector().x() <<
-            //	"," << bearingBody->GetRot().GetVector().y() <<
-            //	"," << bearingBody->GetRot().GetVector().z() << ")" << "\n\n";
+             std::cout << "Time: " << system.GetChTime() << "\n" <<
+                "x:" << prev ->GetPos().x() << " " <<
+                "y:" << prev ->GetPos().y() << " " <<
+                "z:" << prev ->GetPos().z() << " " <<
+                "rot (" << prev ->GetRot().GetVector().x() <<
+                "," << prev ->GetRot().GetVector().y() <<
+                "," << prev ->GetRot().GetVector().z() << ")" << "\n\n";
 
 #if RUN_VISUALIZATION
             application.DoStep();

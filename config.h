@@ -1,7 +1,7 @@
 #pragma once
 
 // I am pretty sure that all of the units are in metric. 
-// Scale's like seconds, metres, kilograms, radians newtons, 
+// Scale's like seconds, centimetres, kilograms, radians newtons, 
 // and joules.
 
 ////////////      Chain Properties      ///////////////
@@ -10,13 +10,13 @@
  * What should the distance between a link and a bearing be?
  */
 
-#define LINK_PADDING 0
+#define LINK_PADDING 0.1
 
 /**
  * What should the distance between bearings in the big container be?
  */
 
-#define BEARING_PADDING 0.005
+#define BEARING_PADDING 1.5
 
 
 /**
@@ -33,19 +33,19 @@
  * How heavy should the link be?
  */
 
-#define LINK_MASS 0.001
+#define LINK_MASS 1
 
 /**
  * How long should the link be?
  */
 
-#define LINK_LENGTH 0.005
+#define LINK_LENGTH 1
 
 /**
  * What should the radius of the link be?
  */
 
-#define LINK_RADIUS 0.001
+#define LINK_RADIUS 0.1
 
 /**
  * What should the friction of the link surface be?
@@ -61,13 +61,13 @@
  * How heavy should the bearing be?
  */
 
-#define BEARING_MASS 0.001
+#define BEARING_MASS 1
 
 /**
  * What should the radius of the bearing be?
  */
 
-#define BEARING_RADIUS 0.002
+#define BEARING_RADIUS 0.5
 
 /**
  * What should the friction of the bearing surface be?
@@ -83,19 +83,19 @@
  * How wide shall ye make the ground?
  */
 
-#define GROUND_WIDTH 1
+#define GROUND_WIDTH 10
 
 /**
  * How long shall ye make the ground?
  */
 
-#define GROUND_LENGTH 1
+#define GROUND_LENGTH 10
 
 /**
  * How thick shall ye make the ground?
  */
 
-#define GROUND_HEIGHT 0.01
+#define GROUND_HEIGHT 0.1
 
 /**
  * How friction-y should the ground be?
@@ -136,7 +136,7 @@
  * that 0.01 for SMC sims seems to work well.
  */
 
-#define SIMULATION_RESOLUTION 0.0005
+#define SIMULATION_RESOLUTION 0.005
 
 /**
  * What is the max duration of the animation?
