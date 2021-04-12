@@ -281,6 +281,11 @@ int main() {
         root1 = next2;
     }
 
+    auto roll = createBearing(system);
+
+    roll->SetPos(ChVector<>(-5, 5, -5));
+    roll->Accumulate_force(ChVector<>(3, 0, 3), roll->GetPos(), false);
+
     /**
      **
      * </Important>
@@ -313,13 +318,14 @@ int main() {
         while (system.GetChTime() < SIMULATION_DURATION_MAX) {
 #endif
 
+            auto log = roll;
              std::cout << "Time: " << system.GetChTime() << "\n" <<
-                "x:" << root1 ->GetPos().x() << " " <<
-                "y:" << root1 ->GetPos().y() << " " <<
-                "z:" << root1 ->GetPos().z() << " " <<
-                "rot (" << root1 ->GetRot().GetVector().x() <<
-                "," << root1 ->GetRot().GetVector().y() <<
-                "," << root1 ->GetRot().GetVector().z() << ")" << "\n\n";
+                "x:" << log ->GetPos().x() << " " <<
+                "y:" << log ->GetPos().y() << " " <<
+                "z:" << log ->GetPos().z() << " " <<
+                "rot (" << log ->GetRot().GetVector().x() <<
+                "," << log ->GetRot().GetVector().y() <<
+                "," << log ->GetRot().GetVector().z() << ")" << "\n\n";
 
 #if RUN_VISUALIZATION
             application.DoStep();

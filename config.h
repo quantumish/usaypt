@@ -103,7 +103,7 @@
  * F_static = F_kinetic = GROUND_FRICTION_FORCE
  */
 
-#define GROUND_FRICTION_FORCE 0
+#define GROUND_FRICTION_FORCE 1
 
 
 
