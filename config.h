@@ -23,7 +23,7 @@
  * How long should the chain be? 0-0 = one length
  */
 
-#define CHAIN_LENGTH 10
+#define CHAIN_LENGTH 5
 
 
 
@@ -136,7 +136,7 @@
  * that 0.01 for SMC sims seems to work well.
  */
 
-#define SIMULATION_RESOLUTION 0.0075
+#define SIMULATION_RESOLUTION 0.01
 
 /**
  * What is the max duration of the animation?
