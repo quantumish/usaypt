@@ -10,13 +10,13 @@
  * What should the distance between a link and a bearing be?
  */
 
-#define LINK_PADDING 0.1
+#define LINK_PADDING 0.05
 
 /**
  * What should the distance between bearings in the big container be?
  */
 
-#define BEARING_PADDING 1.5
+#define BEARING_PADDING 0.05
 
 
 /**

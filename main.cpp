@@ -168,66 +168,60 @@ std::shared_ptr<ChBody> createLink(ChSystem &system, double mass, double radius,
 typedef std::shared_ptr<ChBody> ChBodyPointer;
 
 /**
- * Create one of those 0--0 pieces 
+ * Create one of those 0-- pieces 
  *
  * @param {ChBodyPointer} positionedBearing    the bearing that you have placed where you want already
- * @param {ChBodyPointer} unpositionedBearing    the bearing that you want to connect, no need to set its position
  *
  * **BOTH OF THESE MUST BE ADDED TO THE SYSTEM ALREADY!!!!!!!!**
  * returns the body shared pointer representing the middle stick
  */
 
-ChBodyPointer linkBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation=LINK_LENGTH, double connectorMass=LINK_MASS, double connectorRadius=LINK_RADIUS, double connectorFrictionForce=LINK_FRICTION, double linkBearingPadding=LINK_PADDING);
-ChBodyPointer linkBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation, double connectorMass, double connectorRadius, double connectorFrictionForce, double linkBearingPadding) {
-    // Move the unpositioned element up to the correct position
+ChBodyPointer createSegment(ChSystem &system, ChBodyPointer &positionedBearing, double seperation=LINK_LENGTH, double connectorMass=LINK_MASS, double connectorRadius=LINK_RADIUS, double connectorFrictionForce=LINK_FRICTION, double linkBearingPadding=LINK_PADDING);
+ChBodyPointer createSegment(ChSystem &system, ChBodyPointer &positionedBearing, double seperation, double connectorMass, double connectorRadius, double connectorFrictionForce, double linkBearingPadding) {
+    // Get the position of the positioned bearing
     auto currentPosition = positionedBearing->GetPos();
-    unpositionedBearing->SetPos(ChVector<>(currentPosition.x(), currentPosition.y()+seperation+linkBearingPadding*2, currentPosition.z()));
 
     // Create the link cylinder
     auto linkBody = createLink(system, connectorMass, connectorRadius, seperation, connectorFrictionForce);
 
     // Set the position of the link cylinder
-    linkBody->SetPos(ChVector<>(currentPosition.x(), currentPosition.y()+(seperation/2)+linkBearingPadding, currentPosition.z()));
+    linkBody->SetPos(ChVector<>(currentPosition.x(), currentPosition.y()+connectorRadius+linkBearingPadding+(seperation/2), currentPosition.z()));
 
     // Solder the bearings together with the links
     auto bottomSolder = std::make_shared<ChLinkLockLock>(); // bottom with link
-    auto topSolder = std::make_shared<ChLinkLockLock>(); // top with link
 
     // Establish the links
     bottomSolder -> Initialize(positionedBearing, linkBody,
-            ChCoordsys<>(ChVector<>(currentPosition.x(), currentPosition.y()+(linkBearingPadding/2), currentPosition.z())));
-    topSolder -> Initialize(linkBody, unpositionedBearing,
-            ChCoordsys<>(ChVector<>(currentPosition.x(), currentPosition.y()+seperation+((3*linkBearingPadding)/2), currentPosition.z())));
+            ChCoordsys<>(ChVector<>(currentPosition.x(), currentPosition.y()+connectorRadius+linkBearingPadding, currentPosition.z())));
 
     // Add the constraints to the system
     system.Add(bottomSolder);
-    system.Add(topSolder);
 
     return linkBody;
 }
 
 /**
- * Create one of those (0 0) pieces 
+ * Create one of those 0--( 0) pieces given 0-- and the 0
  *
- * @param {ChBodyPointer} positionedBearing    the bearing that you have placed where you want already
+ * @param {ChBodyPointer} positionedLink        the "link" part of the pre-assembled bearing-and-link assembly that's already positioned correctly
  * @param {ChBodyPointer} unpositionedBearing    the bearing that you want to connect, no need to set its position
  *
  * **BOTH OF THESE MUST BE ADDED TO THE SYSTEM ALREADY!!!!!!!!**
  * returns nada
  */
 
-void groupBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation=BEARING_PADDING);
-void groupBearings(ChSystem &system, ChBodyPointer &positionedBearing, ChBodyPointer &unpositionedBearing, double seperation) {
+void createJoint(ChSystem &system, ChBodyPointer &positionedLink, ChBodyPointer &unpositionedBearing, double seperation=BEARING_PADDING, double linkLength=LINK_LENGTH, double bearingRadius=BEARING_RADIUS);
+void createJoint(ChSystem &system, ChBodyPointer &positionedLink, ChBodyPointer &unpositionedBearing, double seperation, double linkLength, double bearingRadius) {
     // Move the unpositioned element up to the correct position
-    auto currentPosition = positionedBearing->GetPos();
-    unpositionedBearing->SetPos(ChVector<>(currentPosition.x(), currentPosition.y()+seperation, currentPosition.z()));
+    auto currentPosition = positionedLink->GetPos();
+    unpositionedBearing->SetPos(ChVector<>(currentPosition.x(), currentPosition.y()+(linkLength/2)+seperation+bearingRadius, currentPosition.z()));
 
     // Create the link that links the two objects together
     auto bearingsLink = std::make_shared<ChLinkLockSpherical>();
 
     // Establish the links
-    bearingsLink -> Initialize(positionedBearing, unpositionedBearing,
-            ChCoordsys<>(ChVector<>(currentPosition.x(), currentPosition.y()+(seperation/2), currentPosition.z())));
+    bearingsLink -> Initialize(positionedLink, unpositionedBearing,
+            ChCoordsys<>(ChVector<>(currentPosition.x(), currentPosition.y()+(linkLength/2)+(seperation/2), currentPosition.z())));
 
     // Add the constraint to the system
     system.Add(bearingsLink);
@@ -268,23 +262,17 @@ int main() {
     // which will have a reaction force
     auto groundBody = createGround(system);
 
-    auto root1 = createBearing(system);
-    root1->SetPos(ChVector<double>(0,1,0));
+    auto root0 = createBearing(system);
+    root0->SetPos(ChVector<double>(0,1,0));
 
     for (int i=0; i<CHAIN_LENGTH; i++) {
-        auto next1 = createBearing(system);
-        linkBearings(system, root1, next1);
+        ChBodyPointer linkSegment = createSegment(system, root0);
 
-        auto next2 = createBearing(system);
-        groupBearings(system, next1, next2);
+        ChBodyPointer next = createBearing(system);
+        createJoint(system, linkSegment, next);
 
-        root1 = next2;
+        root0 = next;
     }
-
-    auto roll = createBearing(system);
-
-    roll->SetPos(ChVector<>(-5, 5, -5));
-    roll->Accumulate_force(ChVector<>(3, 0, 3), roll->GetPos(), false);
 
     /**
      **
@@ -318,7 +306,7 @@ int main() {
         while (system.GetChTime() < SIMULATION_DURATION_MAX) {
 #endif
 
-            auto log = roll;
+            auto log = root0;
              std::cout << "Time: " << system.GetChTime() << "\n" <<
                 "x:" << log ->GetPos().x() << " " <<
                 "y:" << log ->GetPos().y() << " " <<
