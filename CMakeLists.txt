@@ -6,8 +6,8 @@ project(chainfountain)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_library(CHRONO_ENGINE NAMES libChronoEngine.so REQUIRED)
-find_library(CHRONO_IRRLICHT NAMES libChronoEngine_irrlicht.so REQUIRED)
+find_library(CHRONO_ENGINE NAMES libChronoEngine.so libChronoEngine.dylib REQUIRED)
+find_library(CHRONO_IRRLICHT NAMES libChronoEngine_irrlicht.so libChronoEngine_irrlicht.dylib REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 find_path(CHRONO_INCLUDE NAMES "chrono/ChConfig.h" REQUIRED)
@@ -18,6 +18,8 @@ set(CHRONO_IRRLICHT_INCLUDE "${CHRONO_IRRLICHT_INCLUDE}/irrlicht") # Somewhat qu
 
 # TODO EIGEN3_INCLUDE_DIR is not set tho
 include_directories(${EIGEN3_INCLUDE_DIR} ${CHRONO_INCLUDE} ${CHRONO_IRRLICHT_INCLUDE})
+
+add_compile_options(-O2 -Wall)
 
 link_libraries(${CHRONO_ENGINE} ${CHRONO_IRRLICHT})
 
